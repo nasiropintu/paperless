@@ -16,6 +16,16 @@ pnpm check
 pnpm build:static
 ```
 
+## Deploy to GitHub Pages
+
+The included GitHub Actions workflow checks types, builds the static app, and deploys it when changes are pushed to `main`. It configures the app for the repository path `/paperless/` and publishes the static output from `dist/public`.
+
+1. Push this project to the **main** branch of the `nasiropintu/paperless` GitHub repository.
+2. In the repository, open **Settings → Pages** and set the build and deployment source to **GitHub Actions**.
+3. Push a commit or run **Deploy to GitHub Pages** from the **Actions** tab. After the workflow succeeds, the site will be available at [https://nasiropintu.github.io/paperless/](https://nasiropintu.github.io/paperless/).
+
+The build uses the GitHub Pages subpath for app assets, OCR files, and the service worker. For a differently named repository or a custom domain, update the `base` value in `vite.config.ts` and the deployment URL above. GitHub Pages hosts only the app; scans remain in each visitor's browser profile and are not synced between devices. Camera access is available over the Pages HTTPS URL.
+
 ## Where documents live
 
 Scans are kept in IndexedDB in the current browser profile. The service worker caches the app shell and static resources; OCR worker/core/model files are cached after the first OCR load, so previously loaded OCR can continue offline. The browser may remove local site data, and there is no cross-device sync or account recovery. Export important documents regularly.

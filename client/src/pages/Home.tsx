@@ -370,9 +370,9 @@ export default function Home() {
     try {
       const { createWorker } = await import("tesseract.js");
       worker = await createWorker("eng", 1, {
-        workerPath: "/vendor/tesseract/worker.min.js",
-        corePath: "/vendor/tesseract/",
-        langPath: "/tessdata/",
+        workerPath: `${import.meta.env.BASE_URL}vendor/tesseract/worker.min.js`,
+        corePath: `${import.meta.env.BASE_URL}vendor/tesseract/`,
+        langPath: `${import.meta.env.BASE_URL}tessdata/`,
         gzip: true,
         logger: (message) => { if (message.status === "recognizing text") setOcrProgress(Math.round(message.progress * 100)); },
       });

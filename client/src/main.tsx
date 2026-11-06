@@ -81,8 +81,9 @@ createRoot(document.getElementById("root")!).render(
 );
 
 if ("serviceWorker" in navigator && import.meta.env.PROD) {
+  const baseUrl = import.meta.env.BASE_URL;
   window.addEventListener("load", () => {
-    void navigator.serviceWorker.register("/service-worker.js", { scope: "/" }).catch((error) => {
+    void navigator.serviceWorker.register(`${baseUrl}service-worker.js`, { scope: baseUrl }).catch((error) => {
       console.warn("Paperless offline setup was unavailable:", error);
     });
   });
