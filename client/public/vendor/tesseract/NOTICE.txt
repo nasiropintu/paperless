@@ -1,0 +1,3 @@
+Paperless includes the Tesseract.js worker and Tesseract.js-core runtime under the Apache License 2.0.
+The English OCR traineddata file is from the Tesseract tessdata project and is distributed under Apache License 2.0.
+See the adjacent license files for full license texts.
