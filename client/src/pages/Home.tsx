@@ -3,7 +3,7 @@ import { Capacitor } from "@capacitor/core";
 import {
   ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BookOpenText, Check, ChevronDown, CircleHelp,
   CloudOff, Copy, Download, FileImage, FileLock2, FilePlus2, FileScan, Files,
-  Folder, ImagePlus, LoaderCircle, LockKeyhole, Menu, MoreHorizontal, MoreVertical, Pencil,
+  Folder, Heart, ImagePlus, LoaderCircle, LockKeyhole, Menu, MoreHorizontal, MoreVertical, Pencil,
   Plus, Printer, RotateCw, ScanLine, Search, Share2, ShieldCheck, Sparkles, Tag, Trash2,
   UnlockKeyhole, Upload, X, Zap, Sliders, Layers
 } from "lucide-react";
@@ -715,8 +715,19 @@ export default function Home() {
               <span style={{ width: `${Math.min(100, Math.max(8, (storageUsed / (50 * 1024 * 1024)) * 100))}%` }} />
             </div>
           </div>
+
+          <button className="creator-sidebar-pill" onClick={() => setAboutOpen(true)}>
+            <div className="creator-pill-heart">
+              <Heart size={15} style={{ fill: "currentColor" }} />
+            </div>
+            <div className="creator-pill-text">
+              Crafted with ❤️ by <strong>NasirPintu</strong>
+              <div className="text-[10px] opacity-75">Paperless v1.2.0 · Local Desk</div>
+            </div>
+          </button>
+
           <button className="side-help" onClick={() => setAboutOpen(true)}>
-            <CircleHelp size={15} /> About Paperless
+            <CircleHelp size={15} /> About &amp; AI Credits
           </button>
         </div>
       </aside>
@@ -737,6 +748,13 @@ export default function Home() {
             <span className="truncate font-semibold">{selectedDocument ? selectedDocument.title : workspaceName}</span>
           </div>
           <div className="flex items-center gap-1">
+            <button
+              className="icon-btn-ghost"
+              onClick={() => setAboutOpen(true)}
+              title="About & AI Credits"
+            >
+              <Heart size={19} className="text-[#ff6b6b]" style={{ fill: "currentColor" }} />
+            </button>
             <button
               className="icon-btn-ghost"
               onClick={() => imageInputRef.current?.click()}

@@ -1304,3 +1304,299 @@ button:disabled { opacity: .45; cursor: not-allowed !important; }
     display: none;
   }
 }
+
+/* ==========================================================================
+   NASIRPINTU BRAND KIT & VERSION STYLING
+   ========================================================================== */
+
+.creator-sidebar-pill {
+  margin: 10px 4px 10px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #1d3531 0%, #152926 100%);
+  border: 1px solid #2d554a;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: #e4f3eb;
+  text-align: left;
+  transition: all .2s ease;
+  width: calc(100% - 8px);
+}
+.creator-sidebar-pill:hover {
+  background: #24463d;
+  border-color: #428271;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+.creator-pill-heart {
+  color: #ff6b6b;
+  display: grid;
+  place-items: center;
+  animation: heartBeat 2.4s infinite ease-in-out;
+}
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.22); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.18); }
+  70% { transform: scale(1); }
+}
+.creator-pill-text {
+  font-size: 11px;
+  color: #cce3d8;
+  flex: 1;
+  line-height: 1.35;
+}
+.creator-pill-text strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* App Version Banner */
+.app-version-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #f0f4f1;
+  border: 1px solid #d5dfd7;
+  border-radius: 12px;
+  margin-bottom: 6px;
+}
+.version-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: #172824;
+  color: #a3e6cd;
+  display: grid;
+  place-items: center;
+}
+.version-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #172824;
+}
+.version-desc {
+  margin: 0;
+  font-size: 11px;
+  color: #556c60;
+}
+.version-badge-group {
+  display: flex;
+  gap: 6px;
+}
+.version-pill {
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: #1e3b33;
+  color: #d1fae5;
+  font-size: 10px;
+  font-weight: 700;
+}
+.build-pill {
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: #e2e8e3;
+  color: #3b5046;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Modal Structure from Brand Kit */
+.about-section {
+  margin-top: 18px;
+}
+.about-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.about-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #4b7666;
+  display: flex;
+  align-items: center;
+}
+.ai-sublabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: #71847a;
+}
+.about-narrative {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #496357;
+  margin: 0 0 12px;
+}
+.creator-meta {
+  flex: 1;
+}
+.creator-name {
+  margin: 4px 0 2px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #172824;
+}
+.creator-subtitle {
+  margin: 0 0 6px;
+  font-size: 11px;
+  color: #587366;
+  font-weight: 500;
+}
+.creator-bio {
+  margin: 0;
+  font-size: 12px;
+  color: #4c6659;
+  line-height: 1.5;
+}
+.creator-tagline-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #ff6b6b18;
+  color: #d93d3d;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Social links grid */
+.social-links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+.social-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border: 1px solid #dce4dd;
+  border-radius: 9px;
+  background: #fbfdfa;
+  text-decoration: none;
+  transition: all .16s ease;
+}
+.social-pill:hover {
+  background: #ffffff;
+  border-color: #528c7b;
+  transform: translateY(-1px);
+}
+.social-info {
+  display: flex;
+  flex-direction: column;
+}
+.social-info strong {
+  font-size: 12px;
+  color: #172824;
+}
+.social-info small {
+  font-size: 10px;
+  color: #71847a;
+}
+.social-arrow {
+  color: #71847a;
+}
+
+/* AI Agents Grid */
+.ai-agents-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.ai-agent-chip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f3f6f3;
+  border: 1px solid #d8e2d9;
+}
+.ai-agent-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2ea07d;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.ai-agent-text {
+  display: flex;
+  flex-direction: column;
+}
+.ai-agent-text strong {
+  font-size: 12px;
+  color: #172824;
+}
+.ai-agent-provider {
+  font-size: 9px;
+  color: #5b796d;
+  font-weight: 600;
+}
+.ai-agent-role {
+  font-size: 10px;
+  color: #435b50;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+/* Open source credits */
+.oss-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+.oss-card {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f5f8f5;
+  border: 1px solid #dce4dd;
+}
+.oss-head {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2px;
+}
+.oss-head strong {
+  font-size: 11px;
+  color: #172824;
+}
+.oss-head span {
+  font-size: 9px;
+  color: #657e72;
+}
+.oss-card p {
+  margin: 0;
+  font-size: 10px;
+  color: #4b6659;
+  line-height: 1.35;
+}
+
+/* Modal Footer */
+.about-modal-footer {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid #dce4dd;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #3b5a4d;
+}
+@media (max-width: 580px) {
+  .social-links-grid, .ai-agents-grid, .oss-grid {
+    grid-template-columns: 1fr;
+  }
+}

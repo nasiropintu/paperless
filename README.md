@@ -48,16 +48,31 @@ The bundled Tesseract OCR worker/core and English model include their Apache 2.0
 
 Paperless is built with React, Vite, Tesseract.js, and pdf-lib, alongside the packages listed in `package.json`. Their respective license and notice files are retained with the project, including the bundled Tesseract assets.
 
-## Creator
+## Creator & Universal Brand Attribution
 
 **NasirPintu** (Mohammad Nasiruddin Pintu) · Creator, Product Architect & Open-Source Builder
+*Philosophy: Building 100% free, private-by-design, serverless digital tools that empower individuals without paywalls, subscriptions, tracking, or data surveillance.*
 
-* GitHub: [@nasiropintu](https://github.com/nasiropintu)
-* X: [@nasiropintu](https://x.com/nasiropintu)
-* Instagram: [@the_np2](https://www.instagram.com/the_np2/)
-* Facebook: [mohammadnasiruddin.pintu](https://www.facebook.com/mohammadnasiruddin.pintu/)
+* **GitHub:** [@nasiropintu](https://github.com/nasiropintu)
+* **X (Twitter):** [@nasiropintu](https://x.com/nasiropintu)
+* **Instagram:** [@the_np2](https://www.instagram.com/the_np2/)
+* **Facebook:** [mohammadnasiruddin.pintu](https://www.facebook.com/mohammadnasiruddin.pintu/)
 
-The app includes an About panel with creator links and a project-level AI assistance disclosure. Specific model or assistant credits should reflect documented contributions; they are not inferred from this branding kit.
+> *Crafted with ❤️ by NasirPintu*
+
+### Mandatory AI Model & Agent Collaboration Credits
+
+| AI Model / Assistant | Provider / Lab | Collaboration Role |
+| :--- | :--- | :--- |
+| **Gemini** | Google DeepMind | Architecture, Full-Stack Implementation & Agentic Workflows |
+| **Manus** | Manus AI | Autonomous Planning, Synthesis & System Design |
+| **ChatGPT** | OpenAI | Logic Synthesis, Code Optimization & Reasoning |
+| **DeepSeek** | DeepSeek | Algorithmic Problem-Solving & Deep Code Intelligence |
+| **Claude** | Anthropic | Systems Reasoning, Code Clarity & Technical Drafting |
+| **Vibe by Mistral** | Mistral AI | Fast Code Generation & Pragmatic Engineering |
+
+> *"Architected and guided by **NasirPintu** in active synergy with frontier artificial intelligence models and autonomous coding agents. This project demonstrates the future of human-directed, agent-assisted engineering."*
+
 
 ## License
 
