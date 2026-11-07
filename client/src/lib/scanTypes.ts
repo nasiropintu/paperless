@@ -1,4 +1,4 @@
-export type FilterMode = "original" | "auto" | "grayscale" | "bw" | "contrast" | "shadow";
+export type FilterMode = "original" | "auto" | "grayscale" | "bw" | "contrast" | "shadow" | "sharpen" | "whiteboard";
 export type MarkupMode = "off" | "ink" | "redact" | "signature";
 
 export interface Point {

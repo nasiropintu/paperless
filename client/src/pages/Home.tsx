@@ -80,6 +80,8 @@ function filterPreview(mode: FilterMode) {
   if (mode === "contrast") return "contrast(1.38)";
   if (mode === "shadow") return "brightness(1.13) contrast(0.95)";
   if (mode === "auto") return "contrast(1.12) brightness(1.03)";
+  if (mode === "sharpen") return "contrast(1.2) brightness(1.02)";
+  if (mode === "whiteboard") return "brightness(1.15) contrast(1.25)";
   return "none";
 }
 
@@ -562,31 +564,19 @@ export default function Home() {
     setOcrBusy(true);
     setOcrProgress(0);
     setProgressNote("Extracting text locally…");
-    let worker: any = null;
     try {
-      const { createWorker } = await import("tesseract.js");
-      worker = await createWorker("eng", 1, {
-        workerPath: `${import.meta.env.BASE_URL}vendor/tesseract/worker.min.js`,
-        corePath: `${import.meta.env.BASE_URL}vendor/tesseract/`,
-        langPath: `${import.meta.env.BASE_URL}tessdata/`,
-        gzip: true,
-        logger: (m: any) => {
-          if (m.status === "recognizing text") setOcrProgress(Math.round(m.progress * 100));
-        },
+      const { recognizePages } = await import("@/lib/ocrEngine");
+      const blobs = selectedDocument.pages.map((p) => p.image);
+      const result = await recognizePages(blobs, (progress) => {
+        setOcrProgress(progress.percent);
+        setProgressNote(progress.message);
       });
-      let text = "";
-      for (let i = 0; i < selectedDocument.pages.length; i++) {
-        setProgressNote(`Reading page ${i + 1} of ${selectedDocument.pages.length}…`);
-        const result = await worker.recognize(selectedDocument.pages[i].image);
-        text += `${result.data.text}\n`;
-        setOcrProgress(Math.round(((i + 1) / selectedDocument.pages.length) * 100));
-      }
-      updateDocument(selectedDocument.id, { ocrText: text.trim() });
-      notify("Text extracted and saved with scan.");
+      updateDocument(selectedDocument.id, { ocrText: result.text });
+      const engineLabel = result.engine === "mlkit" ? "ML Kit" : "Tesseract";
+      notify(`Text extracted (${engineLabel}) and saved with scan.`);
     } catch (error) {
       notify(error instanceof Error ? `OCR failed: ${error.message}` : "OCR could not run.");
     } finally {
-      if (worker) await worker.terminate().catch(() => undefined);
       setOcrBusy(false);
       setProgressNote("");
     }
@@ -958,13 +948,13 @@ export default function Home() {
 
                 {activeEditorTab === "filters" && !cropMode && (
                   <div className="filter-chips-row">
-                    {(["auto", "bw", "grayscale", "contrast", "original"] as FilterMode[]).map((mode) => (
+                    {(["auto", "bw", "whiteboard", "sharpen", "grayscale", "contrast", "original"] as FilterMode[]).map((mode) => (
                       <button
                         key={mode}
                         className={`filter-chip ${activePage.filter === mode ? "chip-active" : ""}`}
                         onClick={() => updateActivePage({ filter: mode })}
                       >
-                        {mode === "auto" ? "Magic Auto" : mode === "bw" ? "Clean B&W" : mode === "grayscale" ? "Grayscale" : mode === "contrast" ? "High Contrast" : "Original"}
+                        {mode === "auto" ? "Magic Auto" : mode === "bw" ? "Clean B&W" : mode === "whiteboard" ? "Whiteboard" : mode === "sharpen" ? "Sharpen" : mode === "grayscale" ? "Grayscale" : mode === "contrast" ? "High Contrast" : "Original"}
                       </button>
                     ))}
                   </div>

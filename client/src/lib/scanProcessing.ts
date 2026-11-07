@@ -1,4 +1,6 @@
 import { DEFAULT_CORNERS, type Point, type ScanPage } from "./scanTypes";
+import { detectEdgesOpenCV, isOpenCVReady, loadOpenCV, perspectiveCorrectionOpenCV } from "./opencvProcessor";
+import { autoLevels, sauvolaThreshold, unsharpMask, whiteboardEnhance } from "./imageEnhance";
 
 function loadImage(blob: Blob): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -50,6 +52,14 @@ function cornerFromComponent(points: number[], width: number, height: number): [
 
 /** Lightweight offline heuristic: finds the largest connected, bright, low-saturation page region. */
 function detectCornersInPixels(pixels: Uint8ClampedArray, width: number, height: number): [Point, Point, Point, Point] | null {
+  // Try OpenCV edge detection first
+  if (isOpenCVReady()) {
+    const imageData = new ImageData(new Uint8ClampedArray(pixels), width, height);
+    const cvResult = detectEdgesOpenCV(imageData, width, height);
+    if (cvResult) return cvResult;
+  }
+
+  // Fallback: BFS brightness-threshold algorithm
   const total = width * height;
   const paper = new Uint8Array(total);
   for (let i = 0; i < total; i++) {
@@ -85,7 +95,8 @@ function detectCornersInPixels(pixels: Uint8ClampedArray, width: number, height:
 }
 
 function detectCanvasCorners(source: CanvasImageSource, aspectRatio: number): [Point, Point, Point, Point] | null {
-  const width = 240;
+  // Use higher resolution when OpenCV is available for better edge detection
+  const width = isOpenCVReady() ? 480 : 240;
   const height = Math.max(120, Math.round(width * aspectRatio));
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -102,6 +113,9 @@ export function detectDocumentCornersInVideo(video: HTMLVideoElement): [Point, P
 }
 
 export async function detectDocumentCorners(blob: Blob): Promise<[Point, Point, Point, Point]> {
+  // Kick off OpenCV preload in the background (fire-and-forget)
+  loadOpenCV();
+
   try {
     const image = await loadImage(blob);
     return detectCanvasCorners(image, image.height / image.width) ?? DEFAULT_CORNERS;
@@ -150,20 +164,55 @@ function applyTone(canvas: HTMLCanvasElement, mode: ScanPage["filter"]): void {
   if (!context) return;
   const frame = context.getImageData(0, 0, canvas.width, canvas.height);
   const data = frame.data;
-  for (let i = 0; i < data.length; i += 4) {
-    let r = data[i];
-    let g = data[i + 1];
-    let b = data[i + 2];
-    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-    if (mode === "grayscale") r = g = b = gray;
-    if (mode === "bw") r = g = b = gray > 175 ? 255 : gray < 135 ? 0 : gray > 155 ? 245 : 18;
-    if (mode === "contrast") { r = (r - 128) * 1.38 + 128; g = (g - 128) * 1.38 + 128; b = (b - 128) * 1.38 + 128; }
-    if (mode === "auto") { r = (r - 112) * 1.12 + 121; g = (g - 112) * 1.12 + 121; b = (b - 112) * 1.12 + 121; }
-    if (mode === "shadow") { r += (255 - r) * 0.36 * (1 - r / 255); g += (255 - g) * 0.36 * (1 - g / 255); b += (255 - b) * 0.36 * (1 - b / 255); }
-    data[i] = Math.min(255, Math.max(0, r));
-    data[i + 1] = Math.min(255, Math.max(0, g));
-    data[i + 2] = Math.min(255, Math.max(0, b));
+  const { width, height } = canvas;
+
+  if (mode === "bw") {
+    // Sauvola local adaptive thresholding for crisp black text on white paper
+    const totalPixels = width * height;
+    const gray = new Uint8Array(totalPixels);
+    for (let i = 0; i < totalPixels; i++) {
+      const idx = i * 4;
+      gray[i] = ((data[idx] * 299 + data[idx + 1] * 587 + data[idx + 2] * 114) / 1000) | 0;
+    }
+    const binary = sauvolaThreshold(gray, width, height, 15, 0.2);
+    for (let i = 0; i < totalPixels; i++) {
+      const v = binary[i];
+      const idx = i * 4;
+      data[idx] = v;
+      data[idx + 1] = v;
+      data[idx + 2] = v;
+    }
+  } else if (mode === "auto") {
+    autoLevels(data, data.length);
+    unsharpMask(data, width, height, 0.8);
+  } else if (mode === "contrast") {
+    autoLevels(data, data.length);
+    unsharpMask(data, width, height, 1.5);
+  } else if (mode === "sharpen") {
+    unsharpMask(data, width, height, 2.0);
+  } else if (mode === "whiteboard") {
+    whiteboardEnhance(data, width, height);
+  } else if (mode === "grayscale") {
+    for (let i = 0; i < data.length; i += 4) {
+      const gray = ((data[i] * 299 + data[i + 1] * 587 + data[i + 2] * 114) / 1000) | 0;
+      data[i] = gray;
+      data[i + 1] = gray;
+      data[i + 2] = gray;
+    }
+  } else if (mode === "shadow") {
+    for (let i = 0; i < data.length; i += 4) {
+      let r = data[i];
+      let g = data[i + 1];
+      let b = data[i + 2];
+      r += (255 - r) * 0.36 * (1 - r / 255);
+      g += (255 - g) * 0.36 * (1 - g / 255);
+      b += (255 - b) * 0.36 * (1 - b / 255);
+      data[i] = Math.min(255, Math.max(0, r | 0));
+      data[i + 1] = Math.min(255, Math.max(0, g | 0));
+      data[i + 2] = Math.min(255, Math.max(0, b | 0));
+    }
   }
+
   context.putImageData(frame, 0, 0);
 }
 
@@ -194,15 +243,45 @@ export async function renderPage(page: ScanPage, quality = 0.9, includeMarkup = 
   const sourceContext = src.getContext("2d", { willReadFrequently: true });
   if (!sourceContext) throw new Error("Canvas processing is not available in this browser.");
   sourceContext.drawImage(image, 0, 0, src.width, src.height);
-  const source = sourceContext.getImageData(0, 0, src.width, src.height);
-  const edge = (a: Point, b: Point) => Math.hypot((a.x - b.x) * src.width, (a.y - b.y) * src.height);
   const corners = page.corners?.length === 4 ? page.corners : DEFAULT_CORNERS;
+  const edge = (a: Point, b: Point) => Math.hypot((a.x - b.x) * src.width, (a.y - b.y) * src.height);
   const outWidth = Math.max(500, Math.min(2200, Math.round(Math.max(edge(corners[0], corners[1]), edge(corners[3], corners[2])))));
   const outHeight = Math.max(500, Math.min(3000, Math.round(Math.max(edge(corners[0], corners[3]), edge(corners[1], corners[2])))));
+
+  const turn = ((page.rotation % 360) + 360) % 360;
+
+  // Try OpenCV warpPerspective first
+  if (isOpenCVReady()) {
+    const cvCanvas = perspectiveCorrectionOpenCV(src, corners, outWidth, outHeight);
+    if (cvCanvas) {
+      // Apply rotation if needed
+      const canvas = document.createElement("canvas");
+      canvas.width = turn === 90 || turn === 270 ? outHeight : outWidth;
+      canvas.height = turn === 90 || turn === 270 ? outWidth : outHeight;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      if (context) {
+        if (turn !== 0) {
+          context.save();
+          context.translate(canvas.width / 2, canvas.height / 2);
+          context.rotate((turn * Math.PI) / 180);
+          context.drawImage(cvCanvas, -outWidth / 2, -outHeight / 2);
+          context.restore();
+        } else {
+          context.drawImage(cvCanvas, 0, 0);
+        }
+
+        applyTone(canvas, page.filter);
+        if (includeMarkup) applyStrokes(context, page, canvas.width, canvas.height);
+        return toBlob(canvas, quality);
+      }
+    }
+  }
+
+  // Fallback: manual homography pixel-by-pixel loop
+  const source = sourceContext.getImageData(0, 0, src.width, src.height);
   const transform = homographyToQuad(outWidth, outHeight, corners);
   const [h0, h1, h2, h3, h4, h5, h6, h7] = transform;
   const canvas = document.createElement("canvas");
-  const turn = ((page.rotation % 360) + 360) % 360;
   canvas.width = turn === 90 || turn === 270 ? outHeight : outWidth;
   canvas.height = turn === 90 || turn === 270 ? outWidth : outHeight;
   const output = new ImageData(canvas.width, canvas.height);

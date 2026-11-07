@@ -4,3 +4,9 @@ project(':capacitor-android').projectDir = new File('../node_modules/.pnpm/@capa
 
 include ':capacitor-mlkit-document-scanner'
 project(':capacitor-mlkit-document-scanner').projectDir = new File('../node_modules/.pnpm/@capacitor-mlkit+document-s_d7852f850789754ef07e1e22426bc8ff/node_modules/@capacitor-mlkit/document-scanner/android')
+
+include ':capacitor-mlkit-text-recognition'
+project(':capacitor-mlkit-text-recognition').projectDir = new File('../node_modules/.pnpm/@capacitor-mlkit+text-recog_b98dd1d3a0c46eca84c541d6075fdcac/node_modules/@capacitor-mlkit/text-recognition/android')
+
+include ':capacitor-filesystem'
+project(':capacitor-filesystem').projectDir = new File('../node_modules/.pnpm/@capacitor+filesystem@8.1.5_@capacitor+core@8.6.0/node_modules/@capacitor/filesystem/android')
