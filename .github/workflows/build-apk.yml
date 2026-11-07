@@ -46,7 +46,7 @@ jobs:
           GITHUB_PAGES: "false"
 
       - name: Sync web assets to Capacitor Android
-        run: npx cap sync android
+        run: pnpm exec cap sync android
 
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
