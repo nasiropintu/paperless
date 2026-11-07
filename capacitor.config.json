@@ -1,5 +1,15 @@
 {
   "appId": "com.paperless.app",
   "appName": "Paperless",
-  "webDir": "dist/public"
+  "webDir": "dist/public",
+  "backgroundColor": "#17191C",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "launchAutoHide": true,
+      "backgroundColor": "#17191C",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP"
+    }
+  }
 }
