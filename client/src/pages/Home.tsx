@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { Capacitor } from "@capacitor/core";
 import {
   ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BookOpenText, Check, ChevronDown, CircleHelp,
   CloudOff, Copy, Download, FileImage, FileLock2, FilePlus2, FileScan, Files,
@@ -290,7 +291,85 @@ export default function Home() {
     }));
   };
 
-  const beginScan = (targetDocumentId?: string, replacePageId?: string) => {
+  const beginScan = async (targetDocumentId?: string, replacePageId?: string) => {
+    // 1. Android Native App: Launch Google ML Kit Document Scanner
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const { DocumentScanner } = await import("@capacitor-mlkit/document-scanner");
+        const result = await DocumentScanner.scanDocument({
+          galleryImportAllowed: true,
+          pageLimit: 30,
+          resultFormats: "JPEG_PDF",
+          scannerMode: "FULL",
+        });
+
+        if (result.scannedImages && result.scannedImages.length > 0) {
+          setScanBusy(true);
+          setProgressNote("Importing scanned pages…");
+          const importedPages: ScanPage[] = [];
+          for (const uri of result.scannedImages) {
+            const res = await fetch(Capacitor.convertFileSrc(uri));
+            const blob = await res.blob();
+            // Google ML Kit has already auto-straightened, cropped, and enhanced the page
+            importedPages.push({
+              id: makeId(),
+              image: blob,
+              corners: DEFAULT_CORNERS,
+              rotation: 0,
+              filter: "original",
+              strokes: [],
+              createdAt: Date.now(),
+            });
+          }
+
+          const now = Date.now();
+          if (targetDocumentId) {
+            if (replacePageId) {
+              updateDocument(targetDocumentId, (doc) => ({
+                ...doc,
+                pages: doc.pages.map((p) => (p.id === replacePageId ? importedPages[0] : p)),
+                ocrText: "",
+              }));
+              setSelectedPageId(importedPages[0].id);
+              notify("Page replaced.");
+            } else {
+              updateDocument(targetDocumentId, (doc) => ({
+                ...doc,
+                pages: [...doc.pages, ...importedPages],
+                ocrText: "",
+              }));
+              setSelectedPageId(importedPages[0].id);
+              notify(`${importedPages.length} page${importedPages.length === 1 ? "" : "s"} added.`);
+            }
+          } else {
+            const newDoc: ScanDocument = {
+              id: makeId(),
+              title: `Scan — ${formatDate(now)}`,
+              folder: folderFilter !== "All folders" ? folderFilter : "Inbox",
+              tags: [],
+              pages: importedPages,
+              ocrText: "",
+              createdAt: now,
+              updatedAt: now,
+            };
+            setDocuments((prev) => [newDoc, ...prev]);
+            await persistDocument(newDoc);
+            setSelectedId(newDoc.id);
+            setSelectedPageId(importedPages[0].id);
+            notify(`New scan created with ${importedPages.length} page${importedPages.length === 1 ? "" : "s"}.`);
+          }
+          return;
+        }
+      } catch (err: any) {
+        if (err?.message?.toLowerCase().includes("cancel")) return;
+        console.warn("ML Kit Document Scanner fallback:", err);
+      } finally {
+        setScanBusy(false);
+        setProgressNote("");
+      }
+    }
+
+    // 2. Web / PWA fallback: Open CameraSheet
     setScanTargetId(targetDocumentId ?? null);
     setScanReplacePageId(replacePageId ?? null);
     setDraftPages([]);
