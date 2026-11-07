@@ -1,0 +1,5 @@
+{
+  "appId": "com.paperless.app",
+  "appName": "Paperless",
+  "webDir": "dist/public"
+}
